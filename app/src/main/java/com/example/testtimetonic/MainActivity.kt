@@ -1,20 +1,14 @@
 package com.example.testtimetonic
 
-import android.graphics.Paint.Align
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -29,7 +23,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val loginViewModel = LoginVM()
             val navController = rememberNavController()
+
             TestTimeTonicTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -38,15 +34,22 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController = navController, startDestination = ConstantViews.LOGIN_VIEW.route){
                         composable(ConstantViews.LOGIN_VIEW.route){
-                            LoginView(LoginVM())
+                            LoginView(loginViewModel) {navController.navigate(ConstantViews.LANDING_VIEW.route)}
+                        }
+                        composable(ConstantViews.LANDING_VIEW.route){
+                            Column {
+                                //TODO Create the Landing Page
+                                Text(text = "Landing page")
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
 
-enum class ConstantViews(val route: String){
-    LOGIN_VIEW("LoginView");
+    enum class ConstantViews(val route: String){
+        LOGIN_VIEW("LoginView"),
+        LANDING_VIEW("LandingView")
+    }
 }

@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,21 +23,15 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.example.testtimetonic.ModelViews.LoginVM
 import com.example.testtimetonic.R
 import com.example.testtimetonic.ui.theme.BDarkBlue
@@ -48,7 +39,7 @@ import com.example.testtimetonic.ui.theme.BDiffuseDarkBlue
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginView(viewModel: LoginVM){
+fun LoginView(viewModel: LoginVM, navToLanding: () -> Unit){
 
     val email : String by viewModel.email.observeAsState(initial = "")
     val password : String by viewModel.password.observeAsState(initial = "")
@@ -84,7 +75,7 @@ fun LoginView(viewModel: LoginVM){
 
             LoginButton(loginEnable = loginEnable) {
                 coroutineScope.launch {
-                    viewModel.onLoginSelected()
+                    viewModel.onLoginSelected({navToLanding()})
                 }
             }
         }

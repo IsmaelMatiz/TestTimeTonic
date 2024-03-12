@@ -1,6 +1,5 @@
 package com.example.testtimetonic.ModelViews
 
-import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -38,10 +37,16 @@ class LoginVM: ViewModel() {
         _isPasswordVisible.value = !_isPasswordVisible.value!!
     }
 
-    suspend fun onLoginSelected() {
+    suspend fun onLoginSelected(navToLanding:() -> Unit) {
         _isLoading.value = true
+
+        val navigationViewModel = NavigationViewModel()
         //TODO implement the logic for login with the API calls
         delay(4000)
+
+        navToLanding()
+
         _isLoading.value = false
     }
+
 }
