@@ -2,6 +2,7 @@ package com.example.testtimetonic
 
 import android.graphics.Paint.Align
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.testtimetonic.ui.login.LoginView
 import com.example.testtimetonic.ui.theme.TestTimeTonicTheme
 
 
@@ -23,17 +28,24 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val navController = rememberNavController()
             TestTimeTonicTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                         Text(text = "Hi there")
+                    NavHost(navController = navController, startDestination = ConstantViews.LOGIN_VIEW.route){
+                        composable(ConstantViews.LOGIN_VIEW.route){
+                            LoginView()
+                        }
                     }
                 }
             }
         }
     }
+}
+
+enum class ConstantViews(val route: String){
+    LOGIN_VIEW("LoginView");
 }

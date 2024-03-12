@@ -7,7 +7,7 @@ my logic to solve each point, this could be updated a long the project is being 
 
 I will face this problem with Kotlin for all logic and Jetpack Compose to build the UI, also I'll use the next dependencies to build the project
 
-- androidx.navigation:navigation-ui-ktx:2.7.7 : This will allow me navigation from login to the books list
+- navigation-compose:2.7.7 : This will allow me navigation from login to the books list
 - com.squareup.retrofit2:retrofit:2.9.0 | com.squareup.retrofit2:converter-gson:2.9.0 | com.google.code.gson:gson:2.9.0 | org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0 : All this dependencies will help me to do the API calls and handle the responses
 - lifecycle-runtime-ktx:2.7.0 | runtime-livedata:1.6.3: This 2 will help me to implement the MVVM design pattern
 
