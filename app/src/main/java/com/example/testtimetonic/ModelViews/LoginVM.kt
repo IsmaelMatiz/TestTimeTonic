@@ -40,7 +40,6 @@ class LoginVM: ViewModel() {
     suspend fun onLoginSelected(navToLanding:() -> Unit) {
         _isLoading.value = true
 
-        val navigationViewModel = NavigationViewModel()
         //TODO implement the logic for login with the API calls
         delay(4000)
 
