@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.testtimetonic.ModelViews.LoginVM
 import com.example.testtimetonic.ui.login.LoginView
 import com.example.testtimetonic.ui.theme.TestTimeTonicTheme
 
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController = navController, startDestination = ConstantViews.LOGIN_VIEW.route){
                         composable(ConstantViews.LOGIN_VIEW.route){
-                            LoginView()
+                            LoginView(LoginVM())
                         }
                     }
                 }
