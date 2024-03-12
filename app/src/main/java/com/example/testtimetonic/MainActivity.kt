@@ -17,8 +17,8 @@ import com.example.testtimetonic.ui.login.LoginView
 import com.example.testtimetonic.ui.theme.TestTimeTonicTheme
 
 
-
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
