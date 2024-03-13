@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.testtimetonic.Model.ApiInteraction.Responses.AppKeyResponse
 import com.example.testtimetonic.Model.ApiInteraction.Responses.OAuthKeyResponse
+import com.example.testtimetonic.Model.ApiInteraction.Responses.SessKeyReponse
 import com.example.testtimetonic.Model.ApiInteraction.RetroFitClient
 import com.example.testtimetonic.Model.Constants
 import com.example.testtimetonic.Model.Crythographer.CryptographerManager
@@ -67,6 +68,9 @@ class LoginVM(application: Application): AndroidViewModel(application) {
             email?.value.toString(),
             oAuthKeyResponse
         )}.join()
+        viewModelScope.launch {
+            errorsAlongTheProcess += authStep3(oAuthKeyResponse.oAuthUserid) }.join()
+
 
         Log.i("IsmInfo","Errors along Auth process $errorsAlongTheProcess errors")
         if (errorsAlongTheProcess == 0)
@@ -143,7 +147,7 @@ class LoginVM(application: Application): AndroidViewModel(application) {
                 ?.replace("\"","") ?: Constants.STATUS_NOT_OK.constanVal
             if (oAuthKeyResponse.status == Constants.STATUS_OK.constanVal)
             {
-                oAuthKeyResponse.oauthkey = jsonOb["appkey"]?.toString()
+                oAuthKeyResponse.oauthkey = jsonOb["oauthkey"]?.toString()
                     ?.replace("\"","") ?: "empty"
 
                 oAuthKeyResponse.oAuthUserid = jsonOb["o_u"]?.toString()
@@ -162,11 +166,57 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         return 0 // Indicate success
     }
 
+    suspend fun authStep3(
+        oAuthUserid: String,
+    ): Int{
+        try {
+            // 1. Fetch Sess key  from web service
+            val sessKeyResponse = SessKeyReponse(context)
+            val response = RetroFitClient(context).webServiceLogin
+                .createSessKey(
+                    Constants.CREATE_SESSKEY.constanVal,
+                    oAuthUserid,
+                    getOAuthKey()
+                )
+
+            // 2. Parse the JSON response
+            val jsonOb = Json.parseToJsonElement(response.body().toString()).jsonObject
+
+            // 3. Extract status and handle success/failure and set the app key
+            sessKeyResponse.status = jsonOb["status"]?.toString()
+                ?.replace("\"","") ?: Constants.STATUS_NOT_OK.constanVal
+
+            if (sessKeyResponse.status == Constants.STATUS_OK.constanVal)
+            {
+                sessKeyResponse.sesskey = jsonOb["sesskey"]?.toString()
+                    ?.replace("\"","") ?: "empty"
+            }
+            else {
+                sessKeyResponse.sesskey = "null"
+                return 1// Indicate failure
+            }
+
+        }catch (e : Exception){
+            Log.e("BookStoreDebug", "An error occur along third auth step:\n$e")
+            return 1 // Indicate failure
+        }
+
+        return 0 // Indicate success
+    }
+
     private fun getAppKey(): String{
         val file = getSecretDocument(KeyName.SECRET_KEY_APPKEY,context)
         return CryptographerManager().decrypt(
             inputStream = FileInputStream(file),
             KeyName.SECRET_KEY_APPKEY
+        )?.decodeToString().toString()
+    }
+
+    private fun getOAuthKey(): String{
+        val file = getSecretDocument(KeyName.SECRET_KEY_OAUTHKEY,context)
+        return CryptographerManager().decrypt(
+            inputStream = FileInputStream(file),
+            KeyName.SECRET_KEY_OAUTHKEY
         )?.decodeToString().toString()
     }
 
