@@ -57,12 +57,16 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         _isLoading.value = true
 
         var errorsAlongTheProcess = 0
+        val oAuthKeyResponse = OAuthKeyResponse(context)
         encryptPassword(password?.value?:"")
 
         //TODO implement the logic for login with the API calls
 
         viewModelScope.launch { errorsAlongTheProcess += authStep1() }.join()
-        viewModelScope.launch { errorsAlongTheProcess += authStep2(email?.value.toString())}.join()
+        viewModelScope.launch { errorsAlongTheProcess += authStep2(
+            email?.value.toString(),
+            oAuthKeyResponse
+        )}.join()
 
         Log.i("IsmInfo","Errors along Auth process $errorsAlongTheProcess errors")
         if (errorsAlongTheProcess == 0)
@@ -99,8 +103,8 @@ class LoginVM(application: Application): AndroidViewModel(application) {
 
             // 3. Extract status and handle success/failure and set the app key
             appKeyResponse.status = jsonOb["status"]?.toString()
-                ?.replace("\"","") ?: "nok"
-            if (appKeyResponse.status == "ok")
+                ?.replace("\"","") ?: Constants.STATUS_NOT_OK.constanVal
+            if (appKeyResponse.status == Constants.STATUS_OK.constanVal)
             {
                 appKeyResponse.appkey = jsonOb["appkey"]?.toString()
                     ?.replace("\"","") ?: "empty"
@@ -119,11 +123,11 @@ class LoginVM(application: Application): AndroidViewModel(application) {
     }
 
     suspend fun authStep2(
-        login: String
+        login: String,
+        oAuthKeyResponse: OAuthKeyResponse
     ): Int{
-        //try {
+        try {
             // 1. Fetch Oauth key  from web service
-            val oAuthKeyResponse = OAuthKeyResponse(context)
             val response = RetroFitClient(context).webServiceLogin
                 .createOauthkey(
                     Constants.CREATE_OAUTHKEY.constanVal,
@@ -136,10 +140,13 @@ class LoginVM(application: Application): AndroidViewModel(application) {
 
             // 3. Extract status and handle success/failure and set the app key
             oAuthKeyResponse.status = jsonOb["status"]?.toString()
-                ?.replace("\"","") ?: "nok"
-            if (oAuthKeyResponse.status == "ok")
+                ?.replace("\"","") ?: Constants.STATUS_NOT_OK.constanVal
+            if (oAuthKeyResponse.status == Constants.STATUS_OK.constanVal)
             {
                 oAuthKeyResponse.oauthkey = jsonOb["appkey"]?.toString()
+                    ?.replace("\"","") ?: "empty"
+
+                oAuthKeyResponse.oAuthUserid = jsonOb["o_u"]?.toString()
                     ?.replace("\"","") ?: "empty"
             }
             else {
@@ -147,10 +154,10 @@ class LoginVM(application: Application): AndroidViewModel(application) {
                 return 1// Indicate failure
             }
 
-       // }catch (e : Exception){
-       //     Log.e("BookStoreDebug", "An error occur along second auth step:\n$e")
-       //     return 1 // Indicate failure
-        //}
+       }catch (e : Exception){
+            Log.e("BookStoreDebug", "An error occur along second auth step:\n$e")
+            return 1 // Indicate failure
+       }
 
         return 0 // Indicate success
     }

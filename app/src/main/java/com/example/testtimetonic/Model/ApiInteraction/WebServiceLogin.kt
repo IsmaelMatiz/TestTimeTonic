@@ -21,5 +21,11 @@ interface WebServiceLogin {
         @Query("appkey") appkey: String
     ): Response<JsonElement>
 
+    @POST(".")
+    suspend fun createSessKey(
+        @Query("req") req: String,
+        @Query("o_u") oAuthUserid: String,
+        @Query("oauthkey") pwd: String
+    ): Response<JsonElement>
 
 }

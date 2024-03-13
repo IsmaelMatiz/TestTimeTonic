@@ -24,5 +24,5 @@ class OAuthKeyResponse (var context: Context) {
                 field = "null"
             }
         }
-    var error: String = ""
+    var oAuthUserid: String = ""
 }
