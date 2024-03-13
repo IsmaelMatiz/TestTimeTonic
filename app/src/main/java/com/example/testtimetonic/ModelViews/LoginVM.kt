@@ -6,17 +6,19 @@ import android.util.Patterns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.testtimetonic.Model.ApiInteraction.Responses.AppKeyResponse
+import com.example.testtimetonic.Model.ApiInteraction.Responses.OAuthKeyResponse
 import com.example.testtimetonic.Model.ApiInteraction.RetroFitClient
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import kotlinx.coroutines.delay
+import com.example.testtimetonic.Model.Constants
+import com.example.testtimetonic.Model.Crythographer.CryptographerManager
+import com.example.testtimetonic.Model.Crythographer.KeyName
+import com.example.testtimetonic.Model.Crythographer.getSecretDocument
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
-import org.json.JSONObject
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 class LoginVM(application: Application): AndroidViewModel(application) {
     private val context = getApplication<Application>().applicationContext
@@ -55,13 +57,14 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         _isLoading.value = true
 
         var errorsAlongTheProcess = 0
-        val appKey = AppKeyResponse(context)
+        encryptPassword(password?.value?:"")
 
         //TODO implement the logic for login with the API calls
 
-        viewModelScope.launch { errorsAlongTheProcess += authStep1(appKey) }.join()
+        viewModelScope.launch { errorsAlongTheProcess += authStep1() }.join()
+        viewModelScope.launch { errorsAlongTheProcess += authStep2(email?.value.toString())}.join()
 
-        Log.i("IsmInfo","hubieron $errorsAlongTheProcess errores")
+        Log.i("IsmInfo","Errors along Auth process $errorsAlongTheProcess errors")
         if (errorsAlongTheProcess == 0)
         {
             navToLanding()
@@ -84,9 +87,10 @@ class LoginVM(application: Application): AndroidViewModel(application) {
      *
      * @return 0 on success, 1 on failure.
      */
-    suspend fun authStep1(appKeyResponse: AppKeyResponse): Int{
+    suspend fun authStep1(): Int{
         try {
             // 1. Fetch app key from web service
+            val appKeyResponse = AppKeyResponse(context)
             val response = RetroFitClient(context).webServiceLogin
                 .createAppKey("createAppkey","api")
 
@@ -112,6 +116,70 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         }
 
         return 0 // Indicate success
+    }
+
+    suspend fun authStep2(
+        login: String
+    ): Int{
+        //try {
+            // 1. Fetch Oauth key  from web service
+            val oAuthKeyResponse = OAuthKeyResponse(context)
+            val response = RetroFitClient(context).webServiceLogin
+                .createOauthkey(
+                    Constants.CREATE_OAUTHKEY.constanVal,
+                    login,
+                    getPassword(),
+                    getAppKey())
+
+            // 2. Parse the JSON response
+            val jsonOb = Json.parseToJsonElement(response.body().toString()).jsonObject
+
+            // 3. Extract status and handle success/failure and set the app key
+            oAuthKeyResponse.status = jsonOb["status"]?.toString()
+                ?.replace("\"","") ?: "nok"
+            if (oAuthKeyResponse.status == "ok")
+            {
+                oAuthKeyResponse.oauthkey = jsonOb["appkey"]?.toString()
+                    ?.replace("\"","") ?: "empty"
+            }
+            else {
+                oAuthKeyResponse.oauthkey = "null"
+                return 1// Indicate failure
+            }
+
+       // }catch (e : Exception){
+       //     Log.e("BookStoreDebug", "An error occur along second auth step:\n$e")
+       //     return 1 // Indicate failure
+        //}
+
+        return 0 // Indicate success
+    }
+
+    private fun getAppKey(): String{
+        val file = getSecretDocument(KeyName.SECRET_KEY_APPKEY,context)
+        return CryptographerManager().decrypt(
+            inputStream = FileInputStream(file),
+            KeyName.SECRET_KEY_APPKEY
+        )?.decodeToString().toString()
+    }
+
+    private fun getPassword(): String{
+        val file = getSecretDocument(KeyName.SECRET_KEY_PASSWORD,context)
+        return CryptographerManager().decrypt(
+            inputStream = FileInputStream(file),
+            KeyName.SECRET_KEY_PASSWORD
+        )?.decodeToString().toString()
+    }
+
+    private fun encryptPassword(password: String){
+        val file = getSecretDocument(KeyName.SECRET_KEY_PASSWORD,context)
+        val fos = FileOutputStream(file)
+
+        CryptographerManager().encrypt(
+            bytes = password.encodeToByteArray(),
+            outputStream = fos,
+            KeyName.SECRET_KEY_PASSWORD
+        )?.decodeToString().toString()
     }
 }
 

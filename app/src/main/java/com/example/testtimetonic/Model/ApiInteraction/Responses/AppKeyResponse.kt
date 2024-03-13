@@ -1,8 +1,7 @@
 package com.example.testtimetonic.Model.ApiInteraction.Responses
 
 import android.content.Context
-import android.util.Log
-import com.example.testtimetonic.Model.Crythographer.CrypthographerManager
+import com.example.testtimetonic.Model.Crythographer.CryptographerManager
 import com.example.testtimetonic.Model.Crythographer.KeyName
 import com.example.testtimetonic.Model.Crythographer.getSecretDocument
 import java.io.FileOutputStream
@@ -16,11 +15,12 @@ class AppKeyResponse(var context: Context){
                 val fos = FileOutputStream(file)
 
 
-                field = CrypthographerManager().encrypt(
+                field = CryptographerManager().encrypt(
                     bytes = value.encodeToByteArray(),
                     outputStream = fos,
                     KeyName.SECRET_KEY_APPKEY
                 )?.decodeToString().toString()
+
             }else{
                 field = "null"
             }

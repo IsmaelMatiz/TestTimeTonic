@@ -2,7 +2,6 @@ package com.example.testtimetonic.Model.Crythographer
 
 import android.content.Context
 import android.util.Log
-import com.example.testtimetonic.ModelViews.LoginVM
 import java.io.File
 
 
@@ -18,7 +17,7 @@ fun getSecretDocument(chosenKeyName: KeyName, context: Context): File {
 }
 
 fun clearFilesAndKeys(context: Context){
-    val cryptoManager = CrypthographerManager()
+    val cryptoManager = CryptographerManager()
 
     try {
         cryptoManager.resetKeys()
