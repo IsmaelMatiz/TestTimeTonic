@@ -7,14 +7,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.testtimetonic.Model.Crythographer.clearFilesAndKeys
 import com.example.testtimetonic.ModelViews.LoginVM
-import com.example.testtimetonic.ui.login.LandingView
+import com.example.testtimetonic.ui.landing.LandingView
 import com.example.testtimetonic.ui.login.LoginView
 import com.example.testtimetonic.ui.theme.TestTimeTonicTheme
 
