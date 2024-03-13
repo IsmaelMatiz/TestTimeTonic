@@ -2,10 +2,12 @@ package com.example.testtimetonic.Model.Crythographer
 
 import android.content.Context
 import android.util.Log
+import com.example.testtimetonic.ModelViews.LoginVM
 import java.io.File
 
 
-fun getSecretDocument(chosenKeyName: CrypthographerManager.KeyName, context: Context): File {
+fun getSecretDocument(chosenKeyName: KeyName, context: Context): File {
+
     var file = File(context.filesDir, chosenKeyName.valKeyName+"File.txt")
     if(!file.exists()) {
         file.createNewFile()

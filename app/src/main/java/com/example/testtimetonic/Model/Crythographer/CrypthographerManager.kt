@@ -99,12 +99,11 @@ class CrypthographerManager {
             private const val TRANSFORMATION = "$ALGORITHM/$BLOCK_MODE/$PADDING"
         }
 
+}
 
-    enum class KeyName(val valKeyName: String) {
-        SECRET_KEY_PASSWORD("secretKeyPassword"),
-        SECRET_KEY_APPKEY("secretKeyAppkey"),
-        SECRET_KEY_OAUTHKEY("secretKeyOauthkey"),
-        SECRET_KEY_SESSKEY("secretKeySesskey")
-    }
-
+enum class KeyName(val valKeyName: String) {
+    SECRET_KEY_PASSWORD("secretKeyPassword"),
+    SECRET_KEY_APPKEY("secretKeyAppkey"),
+    SECRET_KEY_OAUTHKEY("secretKeyOauthkey"),
+    SECRET_KEY_SESSKEY("secretKeySesskey")
 }

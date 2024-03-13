@@ -1,5 +1,7 @@
 package com.example.testtimetonic.ui.login
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,7 +42,7 @@ import com.example.testtimetonic.ui.theme.BDiffuseDarkBlue
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginView(viewModel: LoginVM, navToLanding: () -> Unit){
+fun LoginView(viewModel: LoginVM, navToLanding: () -> Unit, context: Context){
 
     val email : String by viewModel.email.observeAsState(initial = "")
     val password : String by viewModel.password.observeAsState(initial = "")
@@ -75,7 +78,12 @@ fun LoginView(viewModel: LoginVM, navToLanding: () -> Unit){
 
             LoginButton(loginEnable = loginEnable) {
                 coroutineScope.launch {
-                    viewModel.onLoginSelected({navToLanding()})
+                    var wasAuthSuccessfullyDone = viewModel.onLoginSelected({navToLanding()})
+
+                    if (wasAuthSuccessfullyDone == 1)
+                        Toast.makeText(context,"authenticacion wrong" +
+                                " check the credentials or try a again later",
+                            Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -138,12 +146,15 @@ private fun PasswordField(
                 placeholder = { Text("Password") },
                 visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                colors = TextFieldDefaults.colors(
+                    cursorColor =  BDarkBlue,
+                    unfocusedTextColor = Color.LightGray,
+                    unfocusedContainerColor = Color.White),
                 trailingIcon = {
                     val image = if (isPasswordVisible)
                         R.drawable.baseline_visibility_off_24
                     else R.drawable.baseline_visibility_24
 
-                    // Please provide localized description for accessibility services
                     val description = if (isPasswordVisible) "Hide password" else "Show password"
 
                     IconButton(onClick = {onPassVisiblePressd()}){

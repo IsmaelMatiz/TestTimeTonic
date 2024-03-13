@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val loginViewModel = LoginVM()
+            val loginViewModel = LoginVM(application)
             val navController = rememberNavController()
 
             TestTimeTonicTheme {
@@ -34,7 +34,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController = navController, startDestination = ConstantViews.LOGIN_VIEW.route){
                         composable(ConstantViews.LOGIN_VIEW.route){
-                            LoginView(loginViewModel) {navController.navigate(ConstantViews.LANDING_VIEW.route)}
+                            LoginView(viewModel =  loginViewModel, context = baseContext,
+                                navToLanding = {navController.navigate(ConstantViews.LANDING_VIEW.route)})
                         }
                         composable(ConstantViews.LANDING_VIEW.route){
                             Column {
