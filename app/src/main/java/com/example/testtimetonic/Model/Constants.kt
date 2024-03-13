@@ -5,5 +5,6 @@ enum class Constants(val constanVal: String) {
     CREATE_OAUTHKEY("createOauthkey"),
     CREATE_SESSKEY("createSesskey"),
     STATUS_OK("ok"),
-    STATUS_NOT_OK("nok")
+    STATUS_NOT_OK("nok"),
+    RETURN_NULL("null")
 }
