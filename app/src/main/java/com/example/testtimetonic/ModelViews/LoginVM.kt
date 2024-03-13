@@ -99,7 +99,7 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         try {
             // 1. Fetch app key from web service
             val appKeyResponse = AppKeyResponse(context)
-            val response = RetroFitClient(context).webServiceLogin
+            val response = RetroFitClient().webServiceLogin
                 .createAppKey("createAppkey","api")
 
             // 2. Parse the JSON response
@@ -132,7 +132,7 @@ class LoginVM(application: Application): AndroidViewModel(application) {
     ): Int{
         try {
             // 1. Fetch Oauth key  from web service
-            val response = RetroFitClient(context).webServiceLogin
+            val response = RetroFitClient().webServiceLogin
                 .createOauthkey(
                     Constants.CREATE_OAUTHKEY.constanVal,
                     login,
@@ -172,7 +172,7 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         try {
             // 1. Fetch Sess key  from web service
             val sessKeyResponse = SessKeyReponse(context)
-            val response = RetroFitClient(context).webServiceLogin
+            val response = RetroFitClient().webServiceLogin
                 .createSessKey(
                     Constants.CREATE_SESSKEY.constanVal,
                     oAuthUserid,

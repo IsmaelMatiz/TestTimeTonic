@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">TestTimeTonic</string>
-    <string name="BASE_URL">https://timetonic.com/live/api.php/</string>
 </resources>
