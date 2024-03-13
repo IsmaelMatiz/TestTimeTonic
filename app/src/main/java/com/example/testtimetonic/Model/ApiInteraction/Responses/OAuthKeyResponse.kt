@@ -7,12 +7,12 @@ import com.example.testtimetonic.Model.Crythographer.KeyName
 import com.example.testtimetonic.Model.Crythographer.getSecretDocument
 import java.io.FileOutputStream
 
-class AppKeyResponse(var context: Context){
+class OAuthKeyResponse (var context: Context) {
     var status: String = ""
-    var appkey: String = ""
+    var oauthkey: String = ""
         set(value) {
             if (value != "null"){
-                val file = getSecretDocument(KeyName.SECRET_KEY_APPKEY,context)
+                val file = getSecretDocument(KeyName.SECRET_KEY_OAUTHKEY,context)
                 val fos = FileOutputStream(file)
 
 

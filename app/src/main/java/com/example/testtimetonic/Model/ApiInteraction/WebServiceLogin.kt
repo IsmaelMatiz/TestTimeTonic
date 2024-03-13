@@ -13,5 +13,13 @@ interface WebServiceLogin {
         @Query("appname") appname: String
     ): Response<JsonElement>
 
+    @POST(".")
+    suspend fun createOauthkey(
+        @Query("req") req: String,
+        @Query("login") login: String,
+        @Query("pwd") pwd: String,
+        @Query("appkey") appkey: String
+    ): Response<JsonElement>
+
 
 }
