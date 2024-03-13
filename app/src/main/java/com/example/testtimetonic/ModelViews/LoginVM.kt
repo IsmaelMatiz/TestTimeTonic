@@ -21,6 +21,18 @@ import kotlinx.serialization.json.jsonObject
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
+/**
+ * ViewModel class responsible for handling login logic and user interaction within the login screen.
+ *
+ * @property context The application context obtained from the application instance.
+ *
+ * **LiveData properties:**
+ *  - _email: Stores the entered email address.
+ *  - _password: Stores the entered password (on login selected is encrypted).
+ *  - _loginEnabled: Indicates whether the login button should be enabled based on email and password validity.
+ *  - _isLoading: Indicates if the login process is currently ongoing.
+ *  - _isPasswordVisible: Indicates if the password field should display plain text or hidden characters.
+ */
 class LoginVM(application: Application): AndroidViewModel(application) {
     private val context = getApplication<Application>().applicationContext
 
@@ -39,21 +51,52 @@ class LoginVM(application: Application): AndroidViewModel(application) {
     private val _isPasswordVisible = MutableLiveData<Boolean>(false)
     val isPasswordVisible : LiveData<Boolean> = _isPasswordVisible
 
+    /**
+     * Updates the internal state of the email and password based on user input,
+     * and sets the login button enabled/disabled based on validity checks.
+     *
+     * @param email The entered email address.
+     * @param password The entered password.
+     */
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
         _password.value = password
         _loginEnabled.value = isValidEmail(email) && isValidPassword(password)
     }
 
+    /**
+     * Simple password length validation.
+     *
+     * @param password The password to validate.
+     * @return True if the password is at least 6 characters long, false otherwise.
+     */
     private fun isValidPassword(password: String): Boolean  = password.length > 6
 
-
+    /**
+     * Uses the Android Patterns class to validate the email format(regex under the hood).
+     *
+     * @param email The email address to validate.
+     * @return True if the email format is valid, false otherwise.
+     */
     private fun isValidEmail(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
-    fun onPasswordVisibleSelected(){
-        _isPasswordVisible.value = !_isPasswordVisible.value!!
-    }
+    /**
+     * Toggles the visibility state of the password field between plain text and hidden characters.
+     */
+    fun onPasswordVisibleSelected() {_isPasswordVisible.value = !_isPasswordVisible.value!!}
 
+    /**
+     * Coroutine function that handles the entire login process.
+     * It performs the following steps:
+     *  1. Fetches and stores the app key (if successful).
+     *  2. Fetches and stores the OAuth key (if successful).
+     *  3. Fetches and stores the session key (if successful).
+     *  4. Logs the number of errors encountered during the process.
+     *  5. Navigates to the landing screen if no errors occurred, otherwise displays an error message.
+     *
+     * @param navToLanding A lambda function to navigate to the landing screen.
+     * @return 0 on success, 1 or more on any errors encountered.
+     */
     suspend fun onLoginSelected(navToLanding:() -> Unit): Int {
         _isLoading.value = true
 
@@ -61,8 +104,7 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         val oAuthKeyResponse = OAuthKeyResponse(context)
         encryptPassword(password?.value?:"")
 
-        //TODO implement the logic for login with the API calls
-
+        // Launch separate coroutines for each auth step to potentially improve performance
         viewModelScope.launch { errorsAlongTheProcess += authStep1() }.join()
         viewModelScope.launch { errorsAlongTheProcess += authStep2(
             email?.value.toString(),
@@ -100,21 +142,23 @@ class LoginVM(application: Application): AndroidViewModel(application) {
             // 1. Fetch app key from web service
             val appKeyResponse = AppKeyResponse(context)
             val response = RetroFitClient().webServiceLogin
-                .createAppKey("createAppkey","api")
+                .createAppKey(
+                    Constants.CREATE_APPKEY.constanVal,
+                    Constants.APP_NAME_APICALL.constanVal)
 
             // 2. Parse the JSON response
             val jsonOb = Json.parseToJsonElement(response.body().toString()).jsonObject
 
             // 3. Extract status and handle success/failure and set the app key
-            appKeyResponse.status = jsonOb["status"]?.toString()
+            appKeyResponse.status = jsonOb[Constants.STATUS.constanVal]?.toString()
                 ?.replace("\"","") ?: Constants.STATUS_NOT_OK.constanVal
             if (appKeyResponse.status == Constants.STATUS_OK.constanVal)
             {
-                appKeyResponse.appkey = jsonOb["appkey"]?.toString()
-                    ?.replace("\"","") ?: "empty"
+                appKeyResponse.appkey = jsonOb[Constants.REF_JSON_OBJ_APPKEY.constanVal]?.toString()
+                    ?.replace("\"","") ?: Constants.RETURN_EMPTY.constanVal
             }
             else {
-                appKeyResponse.appkey = "null"
+                appKeyResponse.appkey = Constants.RETURN_NULL.constanVal
                 return 1// Indicate failure
             }
 
@@ -126,6 +170,15 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         return 0 // Indicate success
     }
 
+    /**
+     * This suspend function performs step 2 of the authentication process.
+     * It retrieves an OAuth key from a web service using the provided login credentials
+     * and the previously retrieved app key.
+     *
+     * @param login The user's login credential (email address).
+     * @param oAuthKeyResponse An object to store the retrieved OAuth key.
+     * @return 0 on success, 1 on any errors encountered.
+     */
     suspend fun authStep2(
         login: String,
         oAuthKeyResponse: OAuthKeyResponse
@@ -142,19 +195,19 @@ class LoginVM(application: Application): AndroidViewModel(application) {
             // 2. Parse the JSON response
             val jsonOb = Json.parseToJsonElement(response.body().toString()).jsonObject
 
-            // 3. Extract status and handle success/failure and set the app key
-            oAuthKeyResponse.status = jsonOb["status"]?.toString()
+            // 3. Extract status and handle success/failure and set the Oauth key
+            oAuthKeyResponse.status = jsonOb[Constants.STATUS.constanVal]?.toString()
                 ?.replace("\"","") ?: Constants.STATUS_NOT_OK.constanVal
             if (oAuthKeyResponse.status == Constants.STATUS_OK.constanVal)
             {
-                oAuthKeyResponse.oauthkey = jsonOb["oauthkey"]?.toString()
-                    ?.replace("\"","") ?: "empty"
+                oAuthKeyResponse.oauthkey = jsonOb[Constants.REF_JSON_OBJ_OAUTHKEY.constanVal]?.toString()
+                    ?.replace("\"","") ?: Constants.RETURN_EMPTY.constanVal
 
-                oAuthKeyResponse.oAuthUserid = jsonOb["o_u"]?.toString()
-                    ?.replace("\"","") ?: "empty"
+                oAuthKeyResponse.oAuthUserid = jsonOb[Constants.REF_JSON_OBJ_OAUTH_ID.constanVal]?.toString()
+                    ?.replace("\"","") ?: Constants.RETURN_EMPTY.constanVal
             }
             else {
-                oAuthKeyResponse.oauthkey = "null"
+                oAuthKeyResponse.oauthkey = Constants.RETURN_NULL.constanVal
                 return 1// Indicate failure
             }
 
@@ -166,6 +219,14 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         return 0 // Indicate success
     }
 
+    /**
+     * This suspend function performs step 3 of the authentication process.
+     * It retrieves a session key from a web service using the provided OAuth user ID
+     * and the previously retrieved OAuth key.
+     *
+     * @param oAuthUserid The user ID obtained from the OAuth response.
+     * @return 0 on success, 1 on any errors encountered.
+     */
     suspend fun authStep3(
         oAuthUserid: String,
     ): Int{
@@ -182,17 +243,17 @@ class LoginVM(application: Application): AndroidViewModel(application) {
             // 2. Parse the JSON response
             val jsonOb = Json.parseToJsonElement(response.body().toString()).jsonObject
 
-            // 3. Extract status and handle success/failure and set the app key
-            sessKeyResponse.status = jsonOb["status"]?.toString()
+            // 3. Extract status and handle success/failure and set the Sess key
+            sessKeyResponse.status = jsonOb[Constants.STATUS.constanVal]?.toString()
                 ?.replace("\"","") ?: Constants.STATUS_NOT_OK.constanVal
 
             if (sessKeyResponse.status == Constants.STATUS_OK.constanVal)
             {
-                sessKeyResponse.sesskey = jsonOb["sesskey"]?.toString()
-                    ?.replace("\"","") ?: "empty"
+                sessKeyResponse.sesskey = jsonOb[Constants.REF_JSON_OBJ_SESSKEY.constanVal]?.toString()
+                    ?.replace("\"","") ?: Constants.RETURN_EMPTY.constanVal
             }
             else {
-                sessKeyResponse.sesskey = "null"
+                sessKeyResponse.sesskey = Constants.RETURN_NULL.constanVal
                 return 1// Indicate failure
             }
 
@@ -204,6 +265,11 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         return 0 // Indicate success
     }
 
+    /**
+     * Retrieves the decrypted app key from secure storage.
+     *
+     * @return The decrypted app key as a string.
+     */
     private fun getAppKey(): String{
         val file = getSecretDocument(KeyName.SECRET_KEY_APPKEY,context)
         return CryptographerManager().decrypt(
@@ -212,6 +278,11 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         )?.decodeToString().toString()
     }
 
+    /**
+     * Retrieves the decrypted OAuth key from secure storage.
+     *
+     * @return The decrypted OAuth key as a string.
+     */
     private fun getOAuthKey(): String{
         val file = getSecretDocument(KeyName.SECRET_KEY_OAUTHKEY,context)
         return CryptographerManager().decrypt(
@@ -220,6 +291,11 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         )?.decodeToString().toString()
     }
 
+    /**
+     * Retrieves the decrypted password entered by user from secure storage.
+     *
+     * @return The decrypted password as a string.
+     */
     private fun getPassword(): String{
         val file = getSecretDocument(KeyName.SECRET_KEY_PASSWORD,context)
         return CryptographerManager().decrypt(
@@ -228,6 +304,11 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         )?.decodeToString().toString()
     }
 
+    /**
+     * Encrypts the provided password and stores it in secure storage.
+     *
+     * @param password The plaintext password to encrypt.
+     */
     private fun encryptPassword(password: String){
         val file = getSecretDocument(KeyName.SECRET_KEY_PASSWORD,context)
         val fos = FileOutputStream(file)
