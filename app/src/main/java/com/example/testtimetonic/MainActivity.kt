@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.testtimetonic.Model.Crythographer.clearFilesAndKeys
 import com.example.testtimetonic.ModelViews.LoginVM
+import com.example.testtimetonic.ui.login.LandingView
 import com.example.testtimetonic.ui.login.LoginView
 import com.example.testtimetonic.ui.theme.TestTimeTonicTheme
 
@@ -42,8 +43,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(ConstantViews.LANDING_VIEW.route){
                             Column {
-                                //TODO Create the Landing Page
-                                Text(text = "Landing page")
+                                LandingView()
                             }
                         }
                     }
