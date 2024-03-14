@@ -7,8 +7,10 @@ my logic to solve each point, this could be updated a long the project is being 
 
 I will face this problem with Kotlin for all logic and Jetpack Compose to build the UI, also I'll use the next dependencies to build the project
 
-- navigation-compose:2.7.7 : This will allow me navigation from login to the books list
-- com.squareup.retrofit2:retrofit:2.9.0 | com.squareup.retrofit2:converter-gson:2.9.0 | com.google.code.gson:gson:2.9.0 | org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0 : All this dependencies will help me to do the API calls and handle the responses
+- kotlinx-serialization-json:1.6.3 - this helps me to serialize manually the json, this because of the encription logic
+- navigation-compose:2.7.7 - This will allow me navigation from login to landing screen
+- coil-compose:2.6.0 - helps me to get images from the we this because the api response gives me a web link fo check the picture
+- com.squareup.retrofit2:retrofit:2.9.0 | com.squareup.retrofit2:converter-gson:2.9.0 | com.google.code.gson:gson:2.9.0 | org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0 - All this dependencies will help me to do the API calls and handle the responses
 - lifecycle-runtime-ktx:2.7.0 | runtime-livedata:1.6.3: This 2 will help me to implement the MVVM design pattern
 
 Now for this app will be required to add only the internet permission on the manifest in order to do the API calls, keeping in mind this technologies, lets take a look how the repo will be handle with Git and the folders Structure
