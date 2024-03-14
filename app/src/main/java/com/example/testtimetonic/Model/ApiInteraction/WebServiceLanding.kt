@@ -1,6 +1,6 @@
-package com.example.testtimetonic.Model.ApiInteraction.Responses
+package com.example.testtimetonic.Model.ApiInteraction
 
-import com.google.gson.JsonElement
+import com.example.testtimetonic.Model.ApiInteraction.Responses.AllBooksResponse
 import retrofit2.Response
 import retrofit2.http.POST
 import retrofit2.http.Query

@@ -6,9 +6,5 @@ class Contact {
     @SerializedName("u_c") var userId : String?  = null
     @SerializedName("firstName") var firstName : String?  = null
     @SerializedName("lastName") var lastName : String?  = null
-    override fun toString(): String {
-        return "Contact(userId=$userId, firstName=$firstName, lastName=$lastName)"
-    }
-
 
 }

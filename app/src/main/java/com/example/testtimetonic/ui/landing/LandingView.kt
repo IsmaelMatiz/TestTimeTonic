@@ -1,7 +1,6 @@
 package com.example.testtimetonic.ui.landing
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -89,7 +88,6 @@ fun LandingView(landingViewModel: LandingVM, oAuthUserid: String?,context: Conte
             LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 128.dp)){
                 for (book in bookList){
                     item {
-                        Log.i("BookStoreDebug", "el link de la imagen es: ${book.ownerPrefs?.oCoverImg}")
                         BookCard(book.ownerPrefs?.title?:"unknown title"
                             ,book.ownerPrefs?.oCoverImg?:"https://ximg.es/280x280/000/fff")
                     }

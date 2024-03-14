@@ -1,9 +1,6 @@
 package com.example.testtimetonic.Model.ApiInteraction
 
-import android.content.Context
-import com.example.testtimetonic.Model.ApiInteraction.Responses.WebServiceLanding
 import com.example.testtimetonic.Model.Constants
-import com.example.testtimetonic.R
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
