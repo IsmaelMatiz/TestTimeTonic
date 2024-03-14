@@ -15,6 +15,13 @@ import com.example.testtimetonic.Model.Crythographer.KeyName
 import com.example.testtimetonic.Model.Crythographer.getSecretDocument
 import java.io.FileInputStream
 
+/**
+ * ViewModel class responsible for handling book and contact data for the landing screen.
+ *
+ * This class fetches book and contact information from the Timetonic API and exposes them
+ * through LiveDatas for observation by the UI layer. It also handles filtering books based
+ * on the selected contact.
+ */
 class LandingVM(application: Application) : AndroidViewModel(application) {
     private val context = application.applicationContext
 
@@ -29,11 +36,22 @@ class LandingVM(application: Application) : AndroidViewModel(application) {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading : LiveData<Boolean> = _isLoading
 
+    /**
+     * Filters the books based on a given contact UC.
+     *
+     * @param contactUC The contact UC to filter by.
+     */
     fun filterBooksByContactUC(contactUC: String) {
         if (contactUC == "N/A") _booksFilterd.value = _books.value
         else _booksFilterd.value = _books.value?.filter { it.contactUC == contactUC }
     }
 
+    /**
+     * Fetches and sets landing information(books and contacts) from the API.
+     *
+     * @param oAuthUserid The OAuth user ID for authentication.
+     * @return 0 for success, 1 for errors.
+     */
     suspend fun getAndSetLandingInfo(oAuthUserid: String): Int{
         _isLoading.value = true
         if (oAuthUserid == "N/A"){
@@ -86,6 +104,11 @@ class LandingVM(application: Application) : AndroidViewModel(application) {
 
     }
 
+    /**
+     * Retrieves the session key and decrypt it from file.
+     *
+     * @return The decrypted session key.
+     */
     private fun getSessKey(): String {
         val file = getSecretDocument(KeyName.SECRET_KEY_SESSKEY,context)
         return CryptographerManager().decrypt(
@@ -94,6 +117,13 @@ class LandingVM(application: Application) : AndroidViewModel(application) {
         )?.decodeToString().toString()
     }
 
+    /**
+     * Fixes the image URLs for book covers.
+     *
+     * This function iterates  adds the [Constants.BASE_URL_TIMETONIC]
+     * through the list of books stored in [_books] and checks if the
+     * `oCoverImg` property within the `ownerPrefs` object is not null or empty.
+     */
     private fun fixePicturesLink(){
         for (book in _books?.value?: emptyList()){
             if (!book.ownerPrefs?.oCoverImg.isNullOrEmpty()){
