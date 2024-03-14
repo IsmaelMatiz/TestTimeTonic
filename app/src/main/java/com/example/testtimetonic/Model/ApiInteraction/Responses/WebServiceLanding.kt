@@ -13,5 +13,5 @@ interface WebServiceLanding {
         @Query("o_u") oAuthUserid: String,
         @Query("u_c") Userid: String,
         @Query("sesskey") sesskey: String,
-    ): Response<JsonElement>
+    ): Response<AllBooksResponse>
 }
