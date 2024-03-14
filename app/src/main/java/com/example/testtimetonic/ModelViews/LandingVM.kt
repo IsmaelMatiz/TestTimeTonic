@@ -26,16 +26,21 @@ class LandingVM(application: Application) : AndroidViewModel(application) {
     private val _contacts = MutableLiveData<List<Contact>>()
     val contacts : LiveData<List<Contact>> = _contacts
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading : LiveData<Boolean> = _isLoading
+
     fun filterBooksByContactUC(contactUC: String) {
         if (contactUC == "N/A") _booksFilterd.value = _books.value
         else _booksFilterd.value = _books.value?.filter { it.contactUC == contactUC }
     }
 
     suspend fun getAndSetLandingInfo(oAuthUserid: String): Int{
-
+        _isLoading.value = true
         if (oAuthUserid == "N/A"){
             Log.e("BookStoreError","no oAuthUserid provided abort " +
                     "get and set landing")
+
+            _isLoading.value = false
             return 1
         }
 
@@ -66,14 +71,17 @@ class LandingVM(application: Application) : AndroidViewModel(application) {
                 fixePicturesLink()
             }else{
                 Log.e("BookStoreError","The api answer with a nok Status")
+                _isLoading.value = false
                 return 1
             }
 
         }catch (e : Exception){
             Log.e("BookStoreError","Erros setting the landing Info: \n$e")
+            _isLoading.value = false
             return 1
         }
 
+        _isLoading.value = false
         return 0
 
     }

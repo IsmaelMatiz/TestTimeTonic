@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -63,6 +65,7 @@ fun LandingView(landingViewModel: LandingVM, oAuthUserid: String?,context: Conte
 
     val contacts by landingViewModel.contacts.observeAsState(initial = listOf<Contact>())
     val bookList by landingViewModel.booksFiltered.observeAsState(initial = listOf<Book>())
+    val isLoading: Boolean by landingViewModel.isLoading.observeAsState(false)
 
     Column {
         Row(
@@ -84,12 +87,22 @@ fun LandingView(landingViewModel: LandingVM, oAuthUserid: String?,context: Conte
                 itemList = contacts
             ) {landingViewModel.filterBooksByContactUC(it?.userId?:"N/A")}
         }
-        Column {
-            LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 128.dp)){
-                for (book in bookList){
-                    item {
-                        BookCard(book.ownerPrefs?.title?:"unknown title"
-                            ,book.ownerPrefs?.oCoverImg?:"https://ximg.es/280x280/000/fff")
+        if(isLoading){
+            Box(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
+        }else {
+            Column {
+                LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 128.dp)) {
+                    for (book in bookList) {
+                        item {
+                            BookCard(
+                                book.ownerPrefs?.title ?: "unknown title",
+                                book.ownerPrefs?.oCoverImg ?: "https://ximg.es/280x280/000/fff"
+                            )
+                        }
                     }
                 }
             }
