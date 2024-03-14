@@ -25,7 +25,7 @@ interface WebServiceLogin {
     suspend fun createSessKey(
         @Query("req") req: String,
         @Query("o_u") oAuthUserid: String,
-        @Query("oauthkey") pwd: String
+        @Query("oauthkey") oAuthKey: String
     ): Response<JsonElement>
 
 }

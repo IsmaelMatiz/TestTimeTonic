@@ -61,7 +61,7 @@ class LoginVM(application: Application): AndroidViewModel(application) {
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
         _password.value = password
-        _loginEnabled.value = isValidEmail(email) && isValidPassword(password)
+        _loginEnabled.value = /*isValidEmail(email) && */isValidPassword(password)
     }
 
     /**
@@ -70,7 +70,7 @@ class LoginVM(application: Application): AndroidViewModel(application) {
      * @param password The password to validate.
      * @return True if the password is at least 6 characters long, false otherwise.
      */
-    private fun isValidPassword(password: String): Boolean  = password.length > 6
+    private fun isValidPassword(password: String): Boolean  = password.length > 3
 
     /**
      * Uses the Android Patterns class to validate the email format(regex under the hood).
@@ -97,7 +97,7 @@ class LoginVM(application: Application): AndroidViewModel(application) {
      * @param navToLanding A lambda function to navigate to the landing screen.
      * @return 0 on success, 1 or more on any errors encountered.
      */
-    suspend fun onLoginSelected(navToLanding:() -> Unit): Int {
+    suspend fun onLoginSelected(navToLanding:(String) -> Unit): Int {
         _isLoading.value = true
 
         var errorsAlongTheProcess = 0
@@ -117,7 +117,7 @@ class LoginVM(application: Application): AndroidViewModel(application) {
         Log.i("IsmInfo","Errors along Auth process $errorsAlongTheProcess errors")
         if (errorsAlongTheProcess == 0)
         {
-            navToLanding()
+            navToLanding(oAuthKeyResponse.oAuthUserid)
             _isLoading.value = false
             return 0
         }

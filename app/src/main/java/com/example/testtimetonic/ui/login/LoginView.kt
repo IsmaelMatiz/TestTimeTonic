@@ -42,7 +42,7 @@ import com.example.testtimetonic.ui.theme.BDiffuseDarkBlue
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginView(viewModel: LoginVM, navToLanding: () -> Unit, context: Context){
+fun LoginView(viewModel: LoginVM, navToLanding: (String) -> Unit, context: Context){
 
     val email : String by viewModel.email.observeAsState(initial = "")
     val password : String by viewModel.password.observeAsState(initial = "")
@@ -78,7 +78,7 @@ fun LoginView(viewModel: LoginVM, navToLanding: () -> Unit, context: Context){
 
             LoginButton(loginEnable = loginEnable) {
                 coroutineScope.launch {
-                    var wasAuthSuccessfullyDone = viewModel.onLoginSelected({navToLanding()})
+                    var wasAuthSuccessfullyDone = viewModel.onLoginSelected({navToLanding(it)})
 
                     if (wasAuthSuccessfullyDone == 1)
                         Toast.makeText(context,"authenticacion wrong" +

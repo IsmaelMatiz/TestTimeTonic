@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.testtimetonic.Model.Crythographer.clearFilesAndKeys
+import com.example.testtimetonic.ModelViews.LandingVM
 import com.example.testtimetonic.ModelViews.LoginVM
 import com.example.testtimetonic.ui.landing.LandingView
 import com.example.testtimetonic.ui.login.LoginView
@@ -27,6 +28,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val loginViewModel = LoginVM(application)
+            val landingViewModel = LandingVM(application)
             val navController = rememberNavController()
 
             TestTimeTonicTheme {
@@ -38,11 +40,13 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = ConstantViews.LOGIN_VIEW.route){
                         composable(ConstantViews.LOGIN_VIEW.route){
                             LoginView(viewModel =  loginViewModel, context = baseContext,
-                                navToLanding = {navController.navigate(ConstantViews.LANDING_VIEW.route)})
+                                navToLanding = {navController.navigate(ConstantViews.LANDING_VIEW.route + "/${it}")})
                         }
-                        composable(ConstantViews.LANDING_VIEW.route){
+                        composable(ConstantViews.LANDING_VIEW.route + "/{oAuthUserid}"){
+                            backStackEntry ->
+                            val oAuthUserid = backStackEntry.arguments?.getString("oAuthUserid")
                             Column {
-                                LandingView()
+                                LandingView(landingViewModel,oAuthUserid,baseContext)
                             }
                         }
                     }
